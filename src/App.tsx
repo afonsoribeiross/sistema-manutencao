@@ -50,6 +50,17 @@ function App() {
     else buscarMaquinas()
   }
 
+  async function registrarLeitura(maquina: Maquina) {
+    const { error } = await supabase.from("leituras").insert([
+      {
+        maquina_id: maquina.id,
+        temperatura: maquina.temperatura,
+        status: maquina.status
+    }
+    ])
+    if (error) console.error(error)
+    else alert(`Leitura de ${maquina.nome} registrada!`)
+}
   const totalFalhas = maquinas.filter(m => m.status === "falha").length
   const totalAlertas = maquinas.filter(m => m.status === "alerta").length
   const totalNormais = maquinas.filter(m => m.status === "normal").length
@@ -105,6 +116,7 @@ function App() {
             <span className={`status-${m.status}`}>{m.status.toUpperCase()}</span>
             <span>{m.temperatura}°C</span>
             <button onClick={() => excluirMaquina(m.id!)} className="btn-excluir">✕</button>
+            <button onClick={() => registrarLeitura(m)} className="btn-leitura">📊</button>
           </div>
         ))}
       </div>
