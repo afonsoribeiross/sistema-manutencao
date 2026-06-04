@@ -82,6 +82,32 @@ function App() {
       setMaquinaSelecionada(id)
     }
   }
+  
+  function calcularPrevisao(leituras: any[]): string {
+    if (leituras.length < 2) return "Registre mais leituras para calcular tendência"
+  
+    const n = leituras.length
+    const temperaturas = leituras.map((l, i) => ({ x: i, y: l.temperatura }))
+    
+    const somaX = temperaturas.reduce((acc, p) => acc + p.x, 0)
+    const somaY = temperaturas.reduce((acc, p) => acc + p.y, 0)
+    const somaXY = temperaturas.reduce((acc, p) => acc + p.x * p.y, 0)
+    const somaX2 = temperaturas.reduce((acc, p) => acc + p.x * p.x, 0)
+    
+    const inclinacao = (n * somaXY - somaX * somaY) / (n * somaX2 - somaX * somaX)
+    
+    if (Math.abs(inclinacao) < 0.1) return "Temperatura estável"
+    
+    if (inclinacao < 0) return `Temperatura em queda (${inclinacao.toFixed(2)}°C por leitura)`
+    
+    const limite = 90
+    const ultimaTemp = leituras[leituras.length - 1].temperatura
+    const leiturasRestantes = Math.ceil((limite - ultimaTemp) / inclinacao)
+    
+    if (leiturasRestantes <= 0) return "⚠️ Temperatura já acima do limite crítico!"
+    
+    return `🔺 Subindo ${inclinacao.toFixed(2)}°C por leitura — limite de ${limite}°C em ~${leiturasRestantes} leituras`
+}
 
   const totalFalhas = maquinas.filter(m => m.status === "falha").length
   const totalAlertas = maquinas.filter(m => m.status === "alerta").length
@@ -152,6 +178,19 @@ function App() {
                     <Line type="monotone" dataKey="temperatura" stroke="#00d4ff" dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
+              </div>
+            )}
+            {maquinaSelecionada === m.id && leituras.length > 0 && (
+              <div className="grafico">
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={leituras}>
+                    <XAxis dataKey="created_at" hide />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="temperatura" stroke="#00d4ff" dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+                <p className="previsao">{calcularPrevisao(leituras)}</p>
               </div>
             )}
           </div>
