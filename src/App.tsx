@@ -1,36 +1,47 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from './supabase'
 import './App.css'
 
 type Status = "normal" | "alerta" | "falha"
 
 interface Maquina {
+  id?: number
   nome: string
   status: Status
   temperatura: number
 }
 
-const maquinasIniciais: Maquina[] = [
-  { nome: "Compressor A", status: "falha", temperatura: 87 },
-  { nome: "Bomba B", status: "normal", temperatura: 45 },
-  { nome: "Motor C", status: "alerta", temperatura: 72 }
-]
-
 function App() {
-  const [maquinas, setMaquinas] = useState<Maquina[]>(maquinasIniciais)
+  const [maquinas, setMaquinas] = useState<Maquina[]>([])
   const [nome, setNome] = useState("")
   const [status, setStatus] = useState<Status>("normal")
   const [temperatura, setTemperatura] = useState("")
   const [filtro, setFiltro] = useState<Status | "todos">("todos")
 
-  function adicionarMaquina() {
+  useEffect(() => {
+    buscarMaquinas()
+  }, [])
+
+  async function buscarMaquinas() {
+    const { data, error } = await supabase.from("maquinas").select("*")
+    if (error) console.error(error)
+    else setMaquinas(data as Maquina[])
+  }
+
+  async function adicionarMaquina() {
     if (!nome || !temperatura) {
       alert("Preencha todos os campos!")
       return
     }
-    const nova: Maquina = { nome, status, temperatura: Number(temperatura) }
-    setMaquinas([...maquinas, nova])
-    setNome("")
-    setTemperatura("")
+    const { error } = await supabase.from("maquinas").insert([
+      { nome, status, temperatura: Number(temperatura) }
+    ])
+    if (error) console.error(error)
+    else {
+      setNome("")
+      setTemperatura("")
+      buscarMaquinas()
+    }
   }
 
   const maquinasFiltradas = filtro === "todos"
@@ -59,8 +70,8 @@ function App() {
       </div>
 
       <div className="lista">
-        {maquinasFiltradas.map((m, i) => (
-          <div key={i} className="maquina">
+        {maquinasFiltradas.map((m) => (
+          <div key={m.id} className="maquina">
             <span>{m.nome}</span>
             <span className={`status-${m.status}`}>{m.status.toUpperCase()}</span>
             <span>{m.temperatura}°C</span>
