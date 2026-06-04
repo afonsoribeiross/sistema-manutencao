@@ -75,3 +75,16 @@ h1 {
 .status-falha { color: #ff4757; }
 .status-normal { color: #2ed573; }
 .status-alerta { color: #ffa502; }
+
+.btn-excluir {
+  background: transparent;
+  border: none;
+  color: #ff4757;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+}
+
+.btn-excluir:hover {
+  color: #ff6b81;
+}

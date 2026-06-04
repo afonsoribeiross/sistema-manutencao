@@ -44,6 +44,12 @@ function App() {
     }
   }
 
+  async function excluirMaquina(id: number) {
+    const { error } = await supabase.from("maquinas").delete().eq("id", id)
+    if (error) console.error(error)
+    else buscarMaquinas()
+  }
+
   const maquinasFiltradas = filtro === "todos"
     ? maquinas
     : maquinas.filter(m => m.status === filtro)
@@ -75,6 +81,7 @@ function App() {
             <span>{m.nome}</span>
             <span className={`status-${m.status}`}>{m.status.toUpperCase()}</span>
             <span>{m.temperatura}°C</span>
+            <button onClick={() => excluirMaquina(m.id!)} className="btn-excluir">✕</button>
           </div>
         ))}
       </div>
