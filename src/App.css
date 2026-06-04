@@ -114,3 +114,16 @@ h1 {
   color: #aaaaaa;
   margin-top: 4px;
 }
+.btn-leitura {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+}
+.grafico {
+  background-color: #16213e;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+}

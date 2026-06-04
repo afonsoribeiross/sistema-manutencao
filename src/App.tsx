@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import './App.css'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 type Status = "normal" | "alerta" | "falha"
 
@@ -17,6 +18,8 @@ function App() {
   const [status, setStatus] = useState<Status>("normal")
   const [temperatura, setTemperatura] = useState("")
   const [filtro, setFiltro] = useState<Status | "todos">("todos")
+  const [maquinaSelecionada, setMaquinaSelecionada] = useState<number | null>(null)
+  const [leituras, setLeituras] = useState<any[]>([])
 
   useEffect(() => {
     buscarMaquinas()
@@ -56,11 +59,30 @@ function App() {
         maquina_id: maquina.id,
         temperatura: maquina.temperatura,
         status: maquina.status
-    }
+      }
     ])
     if (error) console.error(error)
     else alert(`Leitura de ${maquina.nome} registrada!`)
-}
+  }
+
+  async function verLeituras(id: number) {
+    if (maquinaSelecionada === id) {
+      setMaquinaSelecionada(null)
+      setLeituras([])
+      return
+    }
+    const { data, error } = await supabase
+      .from("leituras")
+      .select("*")
+      .eq("maquina_id", id)
+      .order("created_at", { ascending: true })
+    if (error) console.error(error)
+    else {
+      setLeituras(data)
+      setMaquinaSelecionada(id)
+    }
+  }
+
   const totalFalhas = maquinas.filter(m => m.status === "falha").length
   const totalAlertas = maquinas.filter(m => m.status === "alerta").length
   const totalNormais = maquinas.filter(m => m.status === "normal").length
@@ -111,12 +133,27 @@ function App() {
 
       <div className="lista">
         {maquinasFiltradas.map((m) => (
-          <div key={m.id} className="maquina">
-            <span>{m.nome}</span>
-            <span className={`status-${m.status}`}>{m.status.toUpperCase()}</span>
-            <span>{m.temperatura}°C</span>
-            <button onClick={() => excluirMaquina(m.id!)} className="btn-excluir">✕</button>
-            <button onClick={() => registrarLeitura(m)} className="btn-leitura">📊</button>
+          <div key={m.id}>
+            <div className="maquina" onClick={() => verLeituras(m.id!)} style={{ cursor: 'pointer' }}>
+              <span>{m.nome}</span>
+              <span className={`status-${m.status}`}>{m.status.toUpperCase()}</span>
+              <span>{m.temperatura}°C</span>
+              <button onClick={(e) => { e.stopPropagation(); registrarLeitura(m) }} className="btn-leitura">📊</button>
+              <button onClick={(e) => { e.stopPropagation(); excluirMaquina(m.id!) }} className="btn-excluir">✕</button>
+            </div>
+
+            {maquinaSelecionada === m.id && leituras.length > 0 && (
+              <div className="grafico">
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={leituras}>
+                    <XAxis dataKey="created_at" hide />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="temperatura" stroke="#00d4ff" dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </div>
         ))}
       </div>
