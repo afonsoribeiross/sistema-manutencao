@@ -88,3 +88,29 @@ h1 {
 .btn-excluir:hover {
   color: #ff6b81;
 }
+.contador {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.contador-item {
+  background-color: #16213e;
+  border-radius: 8px;
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+
+.contador-numero {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.contador-label {
+  font-size: 12px;
+  color: #aaaaaa;
+  margin-top: 4px;
+}

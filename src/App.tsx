@@ -50,6 +50,10 @@ function App() {
     else buscarMaquinas()
   }
 
+  const totalFalhas = maquinas.filter(m => m.status === "falha").length
+  const totalAlertas = maquinas.filter(m => m.status === "alerta").length
+  const totalNormais = maquinas.filter(m => m.status === "normal").length
+
   const maquinasFiltradas = filtro === "todos"
     ? maquinas
     : maquinas.filter(m => m.status === filtro)
@@ -57,6 +61,25 @@ function App() {
   return (
     <div className="container">
       <h1>Sistema de Manutenção Industrial</h1>
+
+      <div className="contador">
+        <div className="contador-item">
+          <span className="contador-numero">{maquinas.length}</span>
+          <span className="contador-label">Total</span>
+        </div>
+        <div className="contador-item">
+          <span className="contador-numero status-normal">{totalNormais}</span>
+          <span className="contador-label">Normais</span>
+        </div>
+        <div className="contador-item">
+          <span className="contador-numero status-alerta">{totalAlertas}</span>
+          <span className="contador-label">Alertas</span>
+        </div>
+        <div className="contador-item">
+          <span className="contador-numero status-falha">{totalFalhas}</span>
+          <span className="contador-label">Falhas</span>
+        </div>
+      </div>
 
       <div className="formulario">
         <input value={nome} onChange={e => setNome(e.target.value)} placeholder="Nome da máquina" />
