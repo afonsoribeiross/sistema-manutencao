@@ -1,11 +1,15 @@
 # Sistema de Manutenção Industrial
 
+## Demo
+https://sistema-manutencao-kappa.vercel.app
+
 Aplicação web desenvolvida com React, TypeScript e Vite para controle e visualização de máquinas industriais, permitindo cadastro, filtragem por status e acompanhamento de temperatura.
 
 ## Tecnologias
 - React
 - TypeScript
 - Vite
+- Supabase (PostgreSQL)
 - CSS
 - Git/GitHub
 
@@ -17,7 +21,6 @@ Aplicação web desenvolvida com React, TypeScript e Vite para controle e visual
 - Interface responsiva em tema escuro
 
 ## Próximas melhorias
-- Integração com Supabase/PostgreSQL
 - Autenticação de usuários
 - Histórico de manutenções
 - Dashboard com indicadores
